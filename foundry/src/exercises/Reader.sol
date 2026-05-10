@@ -2,6 +2,7 @@
 pragma solidity 0.8.30;
 
 import {IPoolManager} from "../interfaces/IPoolManager.sol";
+import {TransientState} from "../libraries/TransientState.sol";
 
 contract Reader {
     IPoolManager public immutable poolManager;
@@ -10,25 +11,11 @@ contract Reader {
         poolManager = IPoolManager(_poolManager);
     }
 
-    function computeSlot(address target, address currency)
-        public
-        pure
-        returns (bytes32 slot)
-    {
-        assembly ("memory-safe") {
-            mstore(0, and(target, 0xffffffffffffffffffffffffffffffffffffffff))
-            mstore(
-                32, and(currency, 0xffffffffffffffffffffffffffffffffffffffff)
-            )
-            slot := keccak256(0, 64)
-        }
-    }
-
     function getCurrencyDelta(address target, address currency)
         public
         view
         returns (int256 delta)
     {
-        // Write your code here
+        delta = TransientState.currencyDelta(poolManager, target, currency);
     }
 }
